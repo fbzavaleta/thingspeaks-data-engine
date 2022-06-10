@@ -10,4 +10,9 @@ RUN pip3 install -r requirements.txt
 WORKDIR /usr/app/
 COPY  . .
 
-CMD ["python3", "./main.py"]
+CMD streamlit run main.py --server.port=9876
+
+
+
+
+

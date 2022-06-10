@@ -42,3 +42,13 @@ Now you need to check that all the containers have the status Up. The engine wil
 
 All done!!
 If you have any doubt or suggestion, please contact me `benjamin.zavaleta@grieletlabs.com`
+
+
+
+
+
+## Projeto atualizado
+
+Inicialização com ``` docker-compose up ```
+
+Ao terminar de levantar a estrutura, você pode acessar a aplicação através do link  `http://localhost:9876/`

@@ -4,7 +4,7 @@ import os
 from pandas import DataFrame
 
 par_db = {
-    "host": "172.23.0.1",
+    "host": "172.17.0.1",
     "database": "data_sensors",
     "user": "root",
     "password": "root",
@@ -19,12 +19,15 @@ class database:
             database=par_db.get("database"),
             password=par_db.get("password"),
         )
+
         
 
     def execute_from_query(self, sql_file):
         with open(self.dir + "/" + sql_file, "r") as reads:
             sqlScript = reads.read()
+
             cursor_cnxn_msql = self.cnx_mysql.cursor()
+
             cursor_cnxn_msql.execute(sqlScript)
 
     def ingest(self, values:dict, query_str):
@@ -40,3 +43,11 @@ class database:
         data_rows = cursor_cnxn_msql.fetchall()
 
         return data_rows
+
+
+    def select_train_data(self, train_data):
+        self.query_train = f"SELECT * FROM `{train_data}`"
+        cursor_cnxn_msql = self.cnx_mysql.cursor()
+        cursor_cnxn_msql.execute(self.query_train)
+        result = cursor_cnxn_msql.fetchall()
+        return result
