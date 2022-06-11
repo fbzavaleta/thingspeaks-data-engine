@@ -10,6 +10,16 @@ import objects.DataUtils as du
 import objects.DatabaseUtils as db
 import os
 import requests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+import streamlit as st
 
 load_dotenv()
 
@@ -19,6 +29,7 @@ class ingestor_engine:
         pass
 
     def main(self):
+
         self.__build_databases_tables()
         destinity_table = self.__get_parameters("SQL_MAIN_TABLE")
         data_to_insert = self.generate_dataframe()
@@ -93,3 +104,88 @@ class ingestor_engine:
 
 
 ingestor_engine().main()
+
+
+datautils = db.database()
+dataframe = datautils.select_air_quality_sensors('air_quality_sensors') 
+
+
+    
+def generate_model(X, y):
+    regr = make_pipeline(StandardScaler(), LinearRegression())
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    regr.fit(x_train,y_train)
+    y_pred = regr.predict(x_test)
+    r2 = metrics.r2_score( y_pred, y_test)
+    return regr, r2
+
+
+
+
+##modelo 2
+X = dataframe[['Air_pressure', 'Humidity', 'temperature_', "Controller_temperature", "G"]]
+y = dataframe['eCO2']
+
+modelo1, r2_modelo1 = generate_model(X, y)
+
+
+
+##modelo 2
+X = dataframe[['Air_pressure', 'Humidity', 'temperature_', "Controller_temperature", "G"]]
+y = dataframe['eTVOC']
+
+modelo2, r2_modelo2 = generate_model(X, y)
+
+
+
+st.header("Modelagem Regressão linear")
+st.write("R2 Score Modelo eTVOC: ", r2_modelo2)
+st.write("R2 Score Modelo eCO2: ", r2_modelo1)
+
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.write("Grafico Pressão do Ar e eTVOC")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['Air_pressure'], dataframe['eTVOC'])
+    st.pyplot(fig)
+
+with col2:
+    st.write("Grafico Temperatura e eTVOC")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['temperature_'], dataframe['eTVOC'])
+    st.pyplot(fig)
+
+with col3:
+    st.write("Grafico Umidade e eTVOC")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['Humidity'], dataframe['eTVOC'])
+    st.pyplot(fig)
+
+
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.write("Grafico Pressão do Ar e eCO2")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['Air_pressure'], dataframe['eCO2'])
+    st.pyplot(fig)
+
+with col2:
+    st.write("Grafico Temperatura e eCO2")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['temperature_'], dataframe['eCO2'])
+    st.pyplot(fig)
+
+with col3:
+    st.write("Grafico Umidade e eCO2")
+    fig, ax = plt.subplots()
+    ax.scatter(dataframe['Humidity'], dataframe['eCO2'])
+    st.pyplot(fig)
+
+
+
+
+
